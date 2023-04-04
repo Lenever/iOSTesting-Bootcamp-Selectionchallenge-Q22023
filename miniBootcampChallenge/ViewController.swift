@@ -37,16 +37,33 @@ extension ViewController {
         urls.count
     }
     
-    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: Constants.cellID, for: indexPath) as? ImageCell else { return UICollectionViewCell() }
-        
-        let url = urls[indexPath.row]
-        let data = try? Data(contentsOf: url)
-        let image = UIImage(data: data!)
-        cell.display(image)
-        
-        return cell
+//    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+//        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: Constants.cellID, for: indexPath) as? ImageCell else { return UICollectionViewCell() }
+//
+//        let url = urls[indexPath.row]
+//        let data = try? Data(contentsOf: url)
+//        let image = UIImage(data: data!)
+//        cell.display(image)
+//
+//        return cell
+//    }
+
+  override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+      guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: Constants.cellID, for: indexPath) as? ImageCell else { return UICollectionViewCell() }
+
+      let url = urls[indexPath.row]
+
+    DispatchQueue.global(qos: .userInitiated).async {
+      let data = try? Data(contentsOf: url)
+      let image = UIImage(data: data!)
+
+        DispatchQueue.main.async {
+          cell.display(image)
+        }
     }
+
+    return cell
+  }
 }
 
 
