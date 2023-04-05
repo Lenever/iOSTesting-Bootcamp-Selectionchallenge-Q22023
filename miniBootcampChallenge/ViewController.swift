@@ -27,6 +27,17 @@ class ViewController: UICollectionViewController {
 
 
 // TODO: 1.- Implement a function that allows the app downloading the images without freezing the UI or causing it to work unexpected way
+func fetchImage(url: URL, completion: @escaping (UIImage?) -> Void) {
+  URLSession.shared.dataTask(with: url) { data, response, error in
+    if let data = data, let image = UIImage(data: data) {
+      DispatchQueue.main.async {
+        completion(image)
+      }
+    } else {
+      completion(nil)
+    }
+  }.resume()
+}
 
 // TODO: 2.- Implement a function that allows to fill the collection view only when all photos have been downloaded, adding an animation for waiting the completion of the task.
 
@@ -37,33 +48,16 @@ extension ViewController {
         urls.count
     }
     
-//    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-//        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: Constants.cellID, for: indexPath) as? ImageCell else { return UICollectionViewCell() }
-//
-//        let url = urls[indexPath.row]
-//        let data = try? Data(contentsOf: url)
-//        let image = UIImage(data: data!)
-//        cell.display(image)
-//
-//        return cell
-//    }
+    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: Constants.cellID, for: indexPath) as? ImageCell else { return UICollectionViewCell() }
 
-  override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-      guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: Constants.cellID, for: indexPath) as? ImageCell else { return UICollectionViewCell() }
+        let url = urls[indexPath.row]
 
-      let url = urls[indexPath.row]
-
-    DispatchQueue.global(qos: .userInitiated).async {
-      let data = try? Data(contentsOf: url)
-      let image = UIImage(data: data!)
-
-        DispatchQueue.main.async {
-          cell.display(image)
-        }
+      fetchImage(url: url) { image in
+        cell.display(image)
+      }
+        return cell
     }
-
-    return cell
-  }
 }
 
 
